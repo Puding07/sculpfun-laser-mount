@@ -14,8 +14,10 @@
 //    assembly      - összeállítás nézet
 //
 //  Koordináták: a spindle tengelye a Z tengely, origó a bilincs alja.
-//  A lézer a +X oldalon van, a sín függőleges, a lézer felülről csúszik be
-//  az alsó ütközőig, a gombbal oldalról szorítható.
+//  A tartólap a spindle +X oldalán, a spindle-lel párhuzamosan áll (plate_gap
+//  távolságra), a lézer közepe a bilincs közepével egy vonalban van (Y = 0).
+//  A sín függőleges, a lézer felülről csúszik be az alsó ütközőig, a gombbal
+//  oldalról szorítható.
 // =====================================================================
 
 /* [Mit renderel] */
@@ -28,14 +30,15 @@ clamp_h          = 35;
 clamp_wall       = 7;
 split_gap        = 3;
 
-/* [Tartófül a bilincsen] */
-tab_len          = 32;
-tab_t            = 14;
+/* [Tartó talp a bilincsen] */
+pad_w            = 44;    // a talp szélessége (Y)
+pad_bolt_y       = 12;    // a két rögzítőcsavar ±Y pozíciója
 
 /* [Tartólap] */
-plate_t          = 8;
+plate_gap        = 13;    // távolság a spindle palástja és a tartólap között (min. 13)
+plate_t          = 11;    // vastag, hogy a csavarfejek a felület alá süllyedjenek
 slot_travel      = 40;    // magasság-állítás (±20 mm)
-laser_gap        = 3;
+knob_side        = 1;     // 1: gomb +Y felé, -1: gomb -Y felé (tükrözés)
 rec_z0           = -60;   // a sín alsó vége (ütköző) a bilincs aljához képest
 adj              = 0;     // összeállításban: magasság-állítás (-20..+20)
 
@@ -75,10 +78,10 @@ bolt_y = R_in + 5.5;
 ear_y1 = bolt_y + 7;
 clamp_bolt_z = [clamp_h*0.27, clamp_h*0.73];
 
-tab_x0  = R_in + 2;
-tab_x1  = R_out + tab_len;
-tab_bolt_x = [R_out + 8, R_out + tab_len - 8];
-tab_bolt_z = clamp_h/2;
+plate_x0   = spindle_d/2 + plate_gap;   // a tartólap belső (spindle felőli) síkja
+X0         = plate_x0 + plate_t;        // a tartólap külső síkja
+pad_bolt_z = clamp_h/2;
+pad_nut_x  = R_in + 6.5;                // anyahorony helye a talpban
 
 // ---------------- származtatott: befogó (lokális koordináták) ----------------
 // lokális: x = szélesség (0 = sín közepe), y = sín iránya (0 = alsó ütköző, felfelé +),
@@ -103,15 +106,11 @@ stop_h     = 4;
 
 function guide_ys(L) = L >= 40 ? [L*0.2, L*0.8] : [L/2];
 
-// ---------------- származtatott: tartólap ----------------
-plate_y0 = tab_t/2;
-Y0       = plate_y0 + plate_t;                       // a lap külső felülete
-laser_cx = tab_x1 + max(laser_gap + laser_w/2, -fj_xi + fj_w - 2);
-plate_x0 = R_out + 1;
-
 // lokális -> globális (tartólap) transzformáció
+// lokális x -> globális Y, lokális y (sín iránya) -> globális Z, lokális z -> globális +X
 module to_plate(z0) {
-    multmatrix([[1,0,0,laser_cx],[0,0,1,Y0],[0,1,0,z0],[0,0,0,1]]) children();
+    mirror([0, knob_side < 0 ? 1 : 0, 0])
+        multmatrix([[0,0,1,X0],[1,0,0,0],[0,1,0,z0],[0,0,0,1]]) children();
 }
 
 // ---------------- segédek ----------------
@@ -148,19 +147,17 @@ module clamp_right() {
     difference() {
         union() {
             clamp_half_body();
-            translate([tab_x0, -tab_t/2, 0]) cube([tab_x1 - tab_x0, tab_t, clamp_h]);
-            hull() {
-                translate([R_out - 3, -tab_t/2 - 6, 0]) cube([1, tab_t + 12, clamp_h]);
-                translate([R_out + 10, -tab_t/2, 0]) cube([1, tab_t, clamp_h]);
-            }
+            // talp a tartólapnak
+            translate([R_in + 1, -pad_w/2, 0]) cube([plate_x0 - (R_in + 1), pad_w, clamp_h]);
         }
         translate([0, 0, -1]) cylinder(r = R_in, h = clamp_h + 2, $fn = 128);
         clamp_bolt_holes(1);
-        for (x = tab_bolt_x)
-            translate([x, 0, tab_bolt_z]) rotate([90, 0, 0]) {
-                translate([0, 0, -50]) cylinder(d = m5_d, h = 100);
-                translate([0, 0, tab_t/2 - m5_nut_h]) rotate([0, 0, 30]) hex_pocket(m5_nut_af, 20);
-            }
+        // tartólap csavarok (X irányban) + anyahorony felülről
+        for (y = [-pad_bolt_y, pad_bolt_y]) {
+            translate([R_in + 0.5, y, pad_bolt_z]) rotate([0, 90, 0]) cylinder(d = m5_d, h = 50);
+            translate([pad_nut_x - m5_nut_h/2, y - m5_nut_af/2, pad_bolt_z - m5_nut_af/cos(30)/2])
+                cube([m5_nut_h, m5_nut_af, 50]);
+        }
     }
 }
 
@@ -221,23 +218,28 @@ module moving_jaw(L) {
 
 // ======================= TARTÓLAP =======================
 module bracket() {
-    slot_z0 = tab_bolt_z - slot_travel/2 - 8;
-    slot_z1 = tab_bolt_z + slot_travel/2 + 8;
-    rx0 = laser_cx + fj_xi - fj_w;
-    rx1 = laser_cx + ab_x1;
+    slot_z0 = pad_bolt_z - slot_travel/2 - 9;
+    slot_z1 = pad_bolt_z + slot_travel/2 + 9;
+    ys  = [fj_xi - fj_w, ab_x1];
+    ry0 = knob_side > 0 ? ys[0] : -ys[1];
+    ry1 = knob_side > 0 ? ys[1] : -ys[0];
     rz0 = rec_z0 - stop_len;
     rz1 = rec_z0 + rec_len;
     difference() {
         union() {
             hull() {
-                translate([plate_x0, plate_y0, slot_z0]) cube([tab_x1 + 2 - plate_x0, plate_t, slot_z1 - slot_z0]);
-                translate([rx0, plate_y0, rz0]) cube([rx1 - rx0, plate_t, rz1 - rz0]);
+                translate([plate_x0, -pad_w/2, slot_z0]) cube([plate_t, pad_w, slot_z1 - slot_z0]);
+                translate([plate_x0, ry0, rz0]) cube([plate_t, ry1 - ry0, rz1 - rz0]);
             }
             to_plate(rec_z0) receiver_add(rec_len);
         }
-        for (x = tab_bolt_x)
+        // függőleges hosszlyukak, süllyesztett csavarfejjel (a sín átcsúszik felettük)
+        for (y = [-pad_bolt_y, pad_bolt_y]) {
             hull() for (dz = [-slot_travel/2, slot_travel/2])
-                translate([x, 0, tab_bolt_z + dz]) rotate([-90, 0, 0]) cylinder(d = m5_d, h = 100);
+                translate([plate_x0 - 1, y, pad_bolt_z + dz]) rotate([0, 90, 0]) cylinder(d = m5_d, h = 50);
+            hull() for (dz = [-slot_travel/2, slot_travel/2])
+                translate([X0 - m5_head_h - 0.6, y, pad_bolt_z + dz]) rotate([0, 90, 0]) cylinder(d = m5_head_d, h = 50);
+        }
         to_plate(rec_z0) receiver_sub(rec_len, plate_t);
     }
 }
@@ -270,14 +272,14 @@ module dummy_spindle() {
 }
 module dummy_laser() {
     zb = rec_z0 + adj - rail_to_lens;
-    color("teal", 0.85) translate([laser_cx - laser_w/2, Y0 + rail_h, zb]) cube([laser_w, laser_d, laser_h]);
+    color("teal", 0.85) translate([X0 + rail_h, -laser_w/2, zb]) cube([laser_d, laser_w, laser_h]);
     // sín (trapéz)
     color("cadetblue") to_plate(rec_z0 + adj) extrude_y(rail_len)
         polygon([[-rail_w/2, 0], [rail_w/2, 0], [rail_w/2, rail_lip],
                  [rail_w/2 - undercut - (rail_h - jaw_h), rail_h],
                  [-rail_w/2 + undercut + (rail_h - jaw_h), rail_h], [-rail_w/2, rail_lip]]);
     // fókuszgomb
-    color("dimgray") translate([laser_cx, Y0 + rail_h + laser_d/2, zb - 10]) cylinder(d = 22, h = 10);
+    color("dimgray") translate([X0 + rail_h + laser_d/2, 0, zb - 10]) cylinder(d = 22, h = 10);
 }
 
 module assembly() {
@@ -294,7 +296,7 @@ module assembly() {
 
 // ======================= NYOMTATÁSI TÁJOLÁS =======================
 module bracket_print() {
-    translate([-plate_x0, 0, 0]) rotate([90, 0, 0]) translate([0, -plate_y0, 0]) bracket();
+    rotate([0, -90, 0]) translate([-plate_x0, 0, 0]) bracket();
 }
 
 if (part == "assembly")      assembly();
@@ -308,7 +310,7 @@ if (part == "jaw_test")      moving_jaw(20);
 if (part == "print_all") {
     clamp_right();
     translate([-15, 0, 0]) clamp_left();
-    translate([0, -R_out - 140, 0]) bracket_print();
+    translate([140, -R_out - 50, 0]) bracket_print();
     translate([60, 60, 0]) moving_jaw(rec_len);
     translate([-80, 70, 0]) knob();
 }

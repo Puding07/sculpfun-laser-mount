@@ -7,6 +7,15 @@ másodpercek alatt ki- és berakható.
 
 ![Összeállítás](images/assembly.png)
 
+## Elrendezés
+
+A tartólap a spindle-lel párhuzamosan, a spindle palástjától **13 mm-re** áll (`plate_gap`).
+A lézer közepe a bilincs közepével egy vonalban van, és a lap közvetlenül a bilincs talpára
+csavarozódik a lézer közepénél. Így a lézer nem lóg ki oldalra, a kar rövid, kevesebb a rezgés.
+
+![Felülnézet](images/assembly_top.png)
+![Lézer nélkül](images/assembly_nolaser.png)
+
 ## Működés
 
 - A lézer hátulján lévő gyári sín (5,8 mm vastag, 45°-os oldalak) egy fix és egy mozgó pofa
@@ -23,7 +32,7 @@ másodpercek alatt ki- és berakható.
 
 | Fájl | Leírás | Db |
 |---|---|---|
-| `stl/clamp_right.stl` | bilincs jobb fele a tartófüllel | 1 |
+| `stl/clamp_right.stl` | bilincs jobb fele a tartólap talpával | 1 |
 | `stl/clamp_left.stl` | bilincs bal fele (anyacsapdák) | 1 |
 | `stl/bracket.stl` | tartólap: magasságállító hosszlyukak, fix pofa, alsó ütköző, ellentartó | 1 |
 | `stl/jaw.stl` | mozgó pofa | 1 |
@@ -55,7 +64,7 @@ másodpercek alatt ki- és berakható.
 | Mire | Csavar | Db |
 |---|---|---|
 | bilincs összehúzása | M5 × 30 + M5 anya | 4 |
-| tartólap a fülre | M5 × 25 + M5 anya + alátét | 2 |
+| tartólap a bilincs talpára | **M5 × 16** hengeresfejű (imbusz) + M5 anya + alátét | 2 |
 | mozgó pofa vezetése | M4 × 16 (hengeresfejű) + **M4 nyloc anya** | 2 |
 | szorítócsavar | M5 × 25 **hatlapfejű** + M5 anya (a gombba nyomva) | 1 + 1 |
 
@@ -68,25 +77,29 @@ az ugyanide csavarható.
 - 0,2 mm réteg, **4–5 fal**, 40 % gyroid kitöltés
 - Az STL-ek nyomtatási tájolásban vannak, támasz nem kell (a 45°-os alávágás támasz nélkül
   nyomtatható).
-- A tartólap kb. 131 × 110 mm, ez a legtöbb tárgyasztalra ráfér.
+- A tartólap kb. 102 × 112 × 11 mm, ez a legtöbb tárgyasztalra ráfér.
 
 ## Összeszerelés
 
-1. Bilincs: anyák a csapdákba, a két fél a spindle-re a gyári tartó **alá**, a fül +X (jobbra)
-   nézzen. Húzd meg egyenletesen a 4 M5-öt.
+1. Bilincs: anyák a csapdákba, a két fél a spindle-re a gyári tartó **alá**, a talp arra
+   nézzen, ahová a lézert szeretnéd. Ha a hátsó szorítófül a Z-kocsiba ütközne, forgasd el a
+   bilincset a spindle körül (pl. lézer elöl, fülek oldalt). Húzd meg egyenletesen a 4 M5-öt.
 2. Mozgó pofa: tedd a lap hátoldalán lévő hatszög zsebekbe az M4 nyloc anyákat, majd a két M4
    csavart a pofa hosszlyukain át. **Csak annyira húzd meg, hogy a pofa még csússzon, de ne
    lötyögjön** (a nyloc anya megtartja a beállítást).
 3. M5 anya az ellentartó felső hornyába, a hatlapfejű M5 csavart nyomd a gombba, és csavard be.
-4. Tartólap a fülre a 2 M5-tel a hosszlyukakon át.
+4. M5 anyákat a talp felső hornyaiba, majd a tartólapot a 2 M5 × 16-tal a hosszlyukakon át a
+   talpra csavarozod. A csavarfejek a lapba süllyednek, a lézer sínje átcsúszik felettük.
+   **Ne használj 16 mm-nél hosszabb csavart**, mert a spindle-hez érhet.
 5. Lézer be felülről az ütközőig, szorítsd meg a gombot.
-6. **Fókusz:** kivett szerszámmal a Z-vel menj le, a tartólapot a hosszlyukakban tolva állítsd
+6. **Fókusz:** (a lézert kivéve érhetők el a csavarok) kivett szerszámmal a Z-vel menj le, a
+   tartólapot a hosszlyukakban tolva állítsd
    be, hogy a lézer fókuszban legyen, és a spindle-anya ne érjen le. Ezt csak egyszer kell
    megcsinálni, utána az ütköző miatt a lézer mindig ugyanoda kerül.
 
 ## Szoftver / bekötés
 
-- A lézer és a spindle között **X/Y eltolás** van: alapbeállításnál kb. **X +111 mm, Y +46 mm**
+- A lézer és a spindle között **X/Y eltolás** van: alapbeállításnál kb. **X +95 mm, Y 0 mm**
   a spindle tengelyéhez képest. Ezt LightBurnben (*Device Settings → Laser offset*) vagy külön
   munkakoordináta-rendszerrel (G54/G55) kell kezelni. A pontos értéket próbaégetéssel mérd ki.
 - Az eltolás miatt a lézeres munkaterület ennyivel kisebb.
@@ -96,6 +109,9 @@ az ugyanide csavarható.
   A sugár láthatatlan, és a kék (455 nm) lézerekhez való szemüvegek általában NEM védenek ellene.
 
 ## Paraméterek módosítása
+
+Hasznos paraméterek: `plate_gap` (lap–spindle távolság, alap 13 mm), `knob_side` (1 / -1: a
+gomb melyik oldalra nézzen), `rec_z0` (lézer magassága), `rail_w` (sín szélessége).
 
 Nyisd meg a `sculpfun_ir2_spindle_mount.scad`-ot OpenSCAD-ben (Window → Customizer), a `part`
 változóval válaszd ki a részt, majd F6 → Export STL. Parancssorból:
