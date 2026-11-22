@@ -43,13 +43,13 @@ rec_z0           = -60;   // a sín alsó vége (ütköző) a bilincs aljához k
 adj              = 0;     // összeállításban: magasság-állítás (-20..+20)
 
 /* [Lézer sín (dovetail) - a lézer hátulján] */
-rail_w           = 51;    // a sín legszélesebb mérete (a lézertől legtávolabbi lapon) - MÉRD MEG
+rail_w           = 45;    // a sín legszélesebb mérete (lemérve: ~45 mm)
 rail_h           = 5.8;   // a sín vastagsága (lemérve)
 rail_len         = 77;    // a sín hossza (csak az összeállításhoz)
 rail_lip         = 1.0;   // függőleges rész a sín külső élén a 45°-os ferde előtt
 rail_clr         = 0.2;   // hézag a pofáknál
 jaw_h            = 5.0;   // pofa magasság (kisebb mint rail_h, hogy ne érjen a lézerházhoz)
-rec_len          = 60;    // a befogó hossza
+rec_len          = 50;    // a befogó hossza (a hosszlyukak alatt végződik)
 
 /* [Lézer test (összeállításhoz és ütközéshez)] */
 laser_w          = 58;    // a hátlap szélessége (a sín felőli oldal)

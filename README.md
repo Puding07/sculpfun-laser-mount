@@ -45,8 +45,8 @@ csavarozódik a lézer közepénél. Így a lézer nem lóg ki oldalra, a kar r�
 ## ⚠️ Mielőtt kinyomtatod a nagy lapot
 
 1. **`rail_w`: a sín legszélesebb mérete** (a lézertől legtávolabbi lapon, élétől élig). A
-   fotódból becsülve **51 mm** van beállítva. Kérlek, mérd le tolómérővel! A mozgó pofa
-   −3/+5 mm-t tud állítani, így a kis eltérés nem gond, de a pontos érték jobb.
+   Lemérve kb. **45 mm**, ez van beállítva. A mozgó pofa −3/+5 mm-t tud állítani (kb. 42–50 mm-es
+   sínhez jó), így a kis mérési eltérés nem gond.
 2. **Nyomtasd ki a `receiver_test.stl` + `jaw_test.stl` párost** (kb. 30 perc), szereld össze
    2 M5 × 20 csavarral, és próbáld rá a lézer sínjére. Ha jól fogja, jöhet a
    nagy lap. Ha nem, állítsd a `rail_w`, `rail_lip`, `rail_clr` értékeket.
@@ -85,7 +85,7 @@ az ugyanide csavarható.
 - 0,2 mm réteg, **4–5 fal**, 40 % gyroid kitöltés
 - Az STL-ek nyomtatási tájolásban vannak, támasz nem kell (a 45°-os alávágás támasz nélkül
   nyomtatható).
-- A tartólap kb. 102 × 112 × 11 mm, ez a legtöbb tárgyasztalra ráfér.
+- A tartólap kb. 98 × 112 × 11 mm, ez a legtöbb tárgyasztalra ráfér.
 
 ## Összeszerelés
 
