@@ -1,9 +1,23 @@
 # Sculpfun iR-2 lézertartó spindle-re (LeadCNC 1010)
 
-3D nyomtatható tartó, amivel a **Sculpfun iR-2** (1064 nm, 2 W) lézermodul a **vízhűtéses 2,2 kW-os
-spindle testére** szerelhető, így lézerezéshez nem kell leszedni a spindle-t.
+3D nyomtatható tartó, amivel a **Sculpfun iR-2** (1064 nm, 2 W) lézermodul a **80 mm-es,
+vízhűtéses 2,2 kW-os spindle testére** szerelhető, így lézerezéshez nem kell leszedni a spindle-t.
+A lézer egy **SF-A9 stílusú fecskefarkas (dovetail) gyorsrögzítőbe** kerül, és egy gombbal
+másodpercek alatt ki- és berakható.
 
 ![Összeállítás](images/assembly.png)
+
+## Működés
+
+- A lézer hátulján lévő gyári sín (5,8 mm vastag, 45°-os oldalak) egy fix és egy mozgó pofa
+  közé fekszik.
+- A lézert **felülről csúsztatod be**, amíg a sín alja el nem éri az **alsó ütközőt**. Így
+  minden behelyezés után ugyanabba a magasságba kerül, a fókusz nem változik.
+- A **gombos M5 csavar** oldalról nyomja a mozgó pofát, és a 45°-os ferde felületek a lézert a
+  laphoz szorítják.
+- **Kivétel:** a gombot lazítsd meg fél-egy fordulatot, és húzd ki a lézert felfelé.
+
+![Befogó részlet](images/receiver_detail.png)
 
 ## Részek
 
@@ -11,73 +25,81 @@ spindle testére** szerelhető, így lézerezéshez nem kell leszedni a spindle-
 |---|---|---|
 | `stl/clamp_right.stl` | bilincs jobb fele a tartófüllel | 1 |
 | `stl/clamp_left.stl` | bilincs bal fele (anyacsapdák) | 1 |
-| `stl/bracket.stl` | tartólap: magasságállító hosszlyukak + lézer furatok | 1 |
+| `stl/bracket.stl` | tartólap: magasságállító hosszlyukak, fix pofa, alsó ütköző, ellentartó | 1 |
+| `stl/jaw.stl` | mozgó pofa | 1 |
+| `stl/knob.stl` | recés gomb M5 hatlapfejű csavarhoz | 1 |
+| `stl/receiver_test.stl` + `stl/jaw_test.stl` | **20 mm-es próbadarab** mozgó pofával: ezt nyomtasd ki először, és próbáld rá a sínre | 1+1 |
 | `sculpfun_ir2_spindle_mount.scad` | parametrikus forrás (OpenSCAD) | – |
 
 ![Nyomtatási elrendezés](images/print_layout.png)
 
-## ⚠️ Nyomtatás előtt mérd meg
+## ⚠️ Mielőtt kinyomtatod a nagy lapot
 
-Az STL-ek az alapértékekkel készültek. Ha bármelyik eltér, írd át az értéket a `.scad` fájl elején
-(OpenSCAD → Customizer) és exportáld újra.
-
-1. **`spindle_d` – a spindle átmérője.** Alapérték: 85 mm. A legtöbb 2,2 kW-os vízhűtéses spindle
-   **80 mm**-es, ezért mindenképp mérd meg tolómérővel ott, ahová a bilincs kerül.
-2. **`laser_holes` – a lézer rögzítő furatai.** A Sculpfun nem ad ki méretrajzot, ezért **ezek
-   helyőrző értékek** (4 db M3, 20 × 40 mm-es raszter). Mérd le a lézer hátlapján lévő menetes
-   furatokat, vagy a mellékelt "universal plate" furatkiosztását. A koordináták a lézer hátlapjának
-   **felső-közép** pontjától értendők (x oldalra, z lefelé negatív). A furatok 4 mm-es függőleges
-   hosszlyukak, így kis eltérést elnyelnek.
-3. **`laser_w`** – a lézer lapra fekvő oldalának szélessége (a modul 144 × 50 × 58 mm).
-4. **Függőleges hely:** a lézer lencséjének lejjebb kell kerülnie, mint a spindle anyájának/
-   szerszámának, különben fókuszáláskor a spindle ér le előbb. Mérd meg, mennyi a bilincs alja
-   és a spindle-anya alja közötti távolság, és ehhez állítsd a `laser_top_z` értéket
-   (alapból a lézer teteje a bilincs tetejével egy szintben van, a lencse így kb. 110 mm-rel a
-   bilincs alja alatt van, ±20 mm állítással).
-5. A tartólap a bilincs fölé is kinyúlik (állítástól függően 10–30 mm-rel). Hagyj ennyi helyet a
-   bilincs és a gyári spindle-tartó között.
+1. **`rail_w`: a sín legszélesebb mérete** (a lézertől legtávolabbi lapon, élétől élig). A
+   fotódból becsülve **51 mm** van beállítva. Kérlek, mérd le tolómérővel! A mozgó pofa
+   −3/+5 mm-t tud állítani, így a kis eltérés nem gond, de a pontos érték jobb.
+2. **Nyomtasd ki a `receiver_test.stl` + `jaw_test.stl` párost** (kb. 30 perc), szereld össze
+   1 M4 + 1 M5 csavarral, és próbáld rá a lézer sínjére. Ha jól fogja, jöhet a
+   nagy lap. Ha nem, állítsd a `rail_w`, `rail_lip`, `rail_clr` értékeket.
+3. **Függőleges hely (`rec_z0`)**: a sín alja (az ütköző) alapból 60 mm-rel van a bilincs alja
+   alatt. A lézerház alja kb. 12 mm-rel van a sín vége alatt, a fókuszgomb további ~10 mm-rel,
+   tehát a lencse kb. 82 mm-rel van a bilincs alja alatt (±20 mm a hosszlyukakkal).
+   **A lencsének lejjebb kell lennie, mint a spindle anyájának** (kivett szerszámmal). Mérd le
+   a bilincs helye és a spindle-anya alja közötti távolságot, és ha kell, módosítsd a
+   `rec_z0`-t, vagy rakd lejjebb/feljebb a bilincset a spindle testén.
+4. A tartólap a bilincs fölé 10–30 mm-rel kinyúlik, ennyi hely kell a bilincs és a gyári
+   spindle-tartó között.
 
 ## Szükséges csavarok
 
-- 4 db **M5 × 30** (vagy 35) + 4 db M5 anya – a bilincs összehúzása
-- 2 db **M5 × 25** + 2 db M5 anya + 2 alátét – a tartólap rögzítése a fülhöz
-- 4 db **M3 × 12** (a lézer furatainak mélységétől függően) – lézer a laphoz
-- opcionális: 1 mm-es gumicsík a bilincs belsejébe (ilyenkor `clamp_clearance` += 1)
+| Mire | Csavar | Db |
+|---|---|---|
+| bilincs összehúzása | M5 × 30 + M5 anya | 4 |
+| tartólap a fülre | M5 × 25 + M5 anya + alátét | 2 |
+| mozgó pofa vezetése | M4 × 16 (hengeresfejű) + **M4 nyloc anya** | 2 |
+| szorítócsavar | M5 × 25 **hatlapfejű** + M5 anya (a gombba nyomva) | 1 + 1 |
+
+A gomb helyett vehetsz **M5-ös állítható szorítókart** (az SF-A9-en is ilyen piros kar van),
+az ugyanide csavarható.
 
 ## Nyomtatás
 
-- Anyag: **PETG** vagy **ASA/ABS** (PLA nem ajánlott: a spindle melegedhet, a PLA kúszik a szorítás alatt)
-- Rétegvastagság 0,2 mm, **4–5 fal**, 40 % kitöltés (gyroid)
-- A bilincsfeleket állva (ahogy az STL-ben vannak), a tartólapot fektetve kell nyomtatni –
-  az STL-ek már így vannak tájolva. Támasz nem kell.
-- Az anyacsapdákba nyomd be az anyákat (egy csepp pillanatragasztó segít).
+- Anyag: **PETG** vagy **ASA/ABS**
+- 0,2 mm réteg, **4–5 fal**, 40 % gyroid kitöltés
+- Az STL-ek nyomtatási tájolásban vannak, támasz nem kell (a 45°-os alávágás támasz nélkül
+  nyomtatható).
+- A tartólap kb. 131 × 110 mm, ez a legtöbb tárgyasztalra ráfér.
 
 ## Összeszerelés
 
-1. Tedd az anyákat a csapdákba, illeszd a két bilincsfelet a spindle-re a gyári tartó **alá**, a
-   tartófül a kívánt oldalra nézzen (alapból +X / jobbra). Húzd meg a 4 M5 csavart egyenletesen.
-2. Csavarozd a lézert a tartólapra (M3, a lap hátoldaláról).
-3. Rögzítsd a tartólapot a fülhöz a 2 M5 csavarral a hosszlyukakon keresztül.
-4. **Fókusz:** vedd ki a marószerszámot, a Z-vel menj le a fókusztávolságra, a lapot a hosszlyukban
-   tolva állítsd be, hogy a lencse alatta legyen a spindle-anyának, majd húzd meg.
+1. Bilincs: anyák a csapdákba, a két fél a spindle-re a gyári tartó **alá**, a fül +X (jobbra)
+   nézzen. Húzd meg egyenletesen a 4 M5-öt.
+2. Mozgó pofa: tedd a lap hátoldalán lévő hatszög zsebekbe az M4 nyloc anyákat, majd a két M4
+   csavart a pofa hosszlyukain át. **Csak annyira húzd meg, hogy a pofa még csússzon, de ne
+   lötyögjön** (a nyloc anya megtartja a beállítást).
+3. M5 anya az ellentartó felső hornyába, a hatlapfejű M5 csavart nyomd a gombba, és csavard be.
+4. Tartólap a fülre a 2 M5-tel a hosszlyukakon át.
+5. Lézer be felülről az ütközőig, szorítsd meg a gombot.
+6. **Fókusz:** kivett szerszámmal a Z-vel menj le, a tartólapot a hosszlyukakban tolva állítsd
+   be, hogy a lézer fókuszban legyen, és a spindle-anya ne érjen le. Ezt csak egyszer kell
+   megcsinálni, utána az ütköző miatt a lézer mindig ugyanoda kerül.
 
 ## Szoftver / bekötés
 
-- A lézer és a spindle között **X/Y eltolás** van (alapbeállításnál kb. X +110 mm, Y +44 mm a
-  spindle tengelyéhez képest). Ezt LightBurnben (*Device Settings → Laser offset*) vagy
-  G-kódban (G92/G54–G55 munkakoordináta) kell kezelni. A pontos értéket egy próbaégetéssel
-  mérd ki: jelölj meg egy pontot a marószerszámmal, majd égess a lézerrel ugyanarra a koordinátára.
-- Az eltolás miatt a hasznos lézeres munkaterület ennyivel kisebb lesz az egyik oldalon.
-- Az iR-2-nek 12/24 V tápellátás és PWM vezérlőjel kell; GRBL-nél `$32=1` (lézer mód) lézerezéshez,
-  marás előtt vissza `$32=0`. **A spindle és a lézer soha ne fusson egyszerre.**
-- **1064 nm-es IR lézer – csak az erre a hullámhosszra minősített védőszemüvegben használd!**
+- A lézer és a spindle között **X/Y eltolás** van: alapbeállításnál kb. **X +111 mm, Y +46 mm**
+  a spindle tengelyéhez képest. Ezt LightBurnben (*Device Settings → Laser offset*) vagy külön
+  munkakoordináta-rendszerrel (G54/G55) kell kezelni. A pontos értéket próbaégetéssel mérd ki.
+- Az eltolás miatt a lézeres munkaterület ennyivel kisebb.
+- Az iR-2-nek 12/24 V és PWM vezérlőjel kell. GRBL-nél lézerezéshez `$32=1`, marás előtt `$32=0`.
+  **A spindle és a lézer soha ne fusson egyszerre.**
+- **1064 nm-es IR lézer: csak erre a hullámhosszra minősített védőszemüvegben használd!**
   A sugár láthatatlan, és a kék (455 nm) lézerekhez való szemüvegek általában NEM védenek ellene.
 
 ## Paraméterek módosítása
 
-Nyisd meg a `sculpfun_ir2_spindle_mount.scad`-ot OpenSCAD-ben, a `part` változóval válaszd ki
-a részt (`clamp_right`, `clamp_left`, `bracket`, `assembly`), majd F6 → Export STL. Parancssorból:
+Nyisd meg a `sculpfun_ir2_spindle_mount.scad`-ot OpenSCAD-ben (Window → Customizer), a `part`
+változóval válaszd ki a részt, majd F6 → Export STL. Parancssorból:
 
 ```sh
-openscad -o stl/bracket.stl -D 'part="bracket"' -D 'spindle_d=80' sculpfun_ir2_spindle_mount.scad
+openscad -o stl/bracket.stl -D 'part="bracket"' -D 'rail_w=50.5' sculpfun_ir2_spindle_mount.scad
 ```
