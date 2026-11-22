@@ -31,8 +31,8 @@ clamp_wall       = 7;
 split_gap        = 3;
 
 /* [Tartó talp a bilincsen] */
-pad_w            = 44;    // a talp szélessége (Y)
-pad_bolt_y       = 12;    // a két rögzítőcsavar ±Y pozíciója
+pad_w            = 60;    // a talp szélessége (Y)
+pad_bolt_y       = 20;    // a két rögzítőcsavar ±Y pozíciója (itt M5x20 sem ér a spindle-hez)
 
 /* [Tartólap] */
 plate_gap        = 13;    // távolság a spindle palástja és a tartólap között (min. 13)
@@ -63,10 +63,10 @@ m5_head_d  = 10;
 m5_head_h  = 5.5;
 m5_nut_af  = 8.3;
 m5_nut_h   = 4.6;
-m4_d       = 4.5;
-m4_head_d  = 8.0;
-m4_nut_af  = 7.3;
-m4_nut_h   = 5.2;   // nyloc
+m5_nyloc_h = 5.5;   // M5 nyloc (önzáró) anya + tűrés
+// Minden csavar M5x20: a süllyesztések mélysége ehhez van méretezve
+clamp_head_depth = 8;   // szorítófül: csavarfej süllyesztés
+clamp_nut_depth  = 7;   // szorítófül: anyacsapda mélysége
 
 $fn = 64;
 
@@ -137,9 +137,9 @@ module clamp_bolt_holes(side) {
         translate([0, s*bolt_y, z]) rotate([0, 90, 0]) {
             translate([0, 0, -1]) cylinder(d = m5_d, h = 100);
             if (side > 0)
-                translate([0, 0, xoff + ear_t - m5_head_h]) cylinder(d = m5_head_d, h = 20);
+                translate([0, 0, xoff + ear_t - clamp_head_depth]) cylinder(d = m5_head_d, h = 20);
             else
-                translate([0, 0, xoff + ear_t - m5_nut_h]) rotate([0, 0, 30]) hex_pocket(m5_nut_af, 20);
+                translate([0, 0, xoff + ear_t - clamp_nut_depth]) rotate([0, 0, 30]) hex_pocket(m5_nut_af, 20);
         }
 }
 
@@ -148,13 +148,13 @@ module clamp_right() {
         union() {
             clamp_half_body();
             // talp a tartólapnak
-            translate([R_in + 1, -pad_w/2, 0]) cube([plate_x0 - (R_in + 1), pad_w, clamp_h]);
+            translate([R_in - 15, -pad_w/2, 0]) cube([plate_x0 - (R_in - 15), pad_w, clamp_h]);
         }
         translate([0, 0, -1]) cylinder(r = R_in, h = clamp_h + 2, $fn = 128);
         clamp_bolt_holes(1);
         // tartólap csavarok (X irányban) + anyahorony felülről
         for (y = [-pad_bolt_y, pad_bolt_y]) {
-            translate([R_in + 0.5, y, pad_bolt_z]) rotate([0, 90, 0]) cylinder(d = m5_d, h = 50);
+            translate([R_in - 10, y, pad_bolt_z]) rotate([0, 90, 0]) cylinder(d = m5_d, h = 50);
             translate([pad_nut_x - m5_nut_h/2, y - m5_nut_af/2, pad_bolt_z - m5_nut_af/cos(30)/2])
                 cube([m5_nut_h, m5_nut_af, 50]);
         }
@@ -187,10 +187,10 @@ module receiver_add(L) {
 }
 // a lapból kivont részek
 module receiver_sub(L, pt) {
-    // vezetőcsavarok M4 + nyloc anya hátul
+    // vezetőcsavarok M5 + nyloc anya hátul
     for (gy = guide_ys(L)) translate([guide_x, gy, 0]) {
-        translate([0, 0, -pt - 1]) cylinder(d = m4_d, h = pt + 2);
-        translate([0, 0, -pt - 1]) rotate([0, 0, 30]) hex_pocket(m4_nut_af, m4_nut_h + 1);
+        translate([0, 0, -pt - 1]) cylinder(d = m5_d, h = pt + 2);
+        translate([0, 0, -pt - 1]) rotate([0, 0, 30]) hex_pocket(m5_nut_af, m5_nyloc_h + 1);
     }
     // tolócsavar M5 + anyahorony felülről
     translate([ab_x0 - 1, L/2, push_z]) rotate([0, 90, 0]) cylinder(d = m5_d, h = ab_w + 2);
@@ -207,9 +207,9 @@ module moving_jaw(L) {
         extrude_y(L) moving_jaw_2d();
         for (gy = guide_ys(L)) {
             hull() for (dx = [-travel_out, travel_in])
-                translate([guide_x + dx, gy, -1]) cylinder(d = m4_d, h = 50);
+                translate([guide_x + dx, gy, -1]) cylinder(d = m5_d, h = 50);
             hull() for (dx = [-travel_out, travel_in])
-                translate([guide_x + dx, gy, 5]) cylinder(d = m4_head_d + 0.5, h = 50);
+                translate([guide_x + dx, gy, 6]) cylinder(d = m5_head_d, h = 50);
         }
         // kis mélyedés a tolócsavar hegyének
         translate([mj_x1 + 0.01, L/2, push_z]) rotate([0, -90, 0]) cylinder(d1 = 5, d2 = 0, h = 2.5);
@@ -238,7 +238,7 @@ module bracket() {
             hull() for (dz = [-slot_travel/2, slot_travel/2])
                 translate([plate_x0 - 1, y, pad_bolt_z + dz]) rotate([0, 90, 0]) cylinder(d = m5_d, h = 50);
             hull() for (dz = [-slot_travel/2, slot_travel/2])
-                translate([X0 - m5_head_h - 0.6, y, pad_bolt_z + dz]) rotate([0, 90, 0]) cylinder(d = m5_head_d, h = 50);
+                translate([X0 - m5_head_h - 0.6, y, pad_bolt_z + dz]) rotate([0, 90, 0]) cylinder(d = m5_head_d, h = m5_head_h + 0.61);
         }
         to_plate(rec_z0) receiver_sub(rec_len, plate_t);
     }

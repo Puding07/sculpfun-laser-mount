@@ -48,7 +48,7 @@ csavarozódik a lézer közepénél. Így a lézer nem lóg ki oldalra, a kar r�
    fotódból becsülve **51 mm** van beállítva. Kérlek, mérd le tolómérővel! A mozgó pofa
    −3/+5 mm-t tud állítani, így a kis eltérés nem gond, de a pontos érték jobb.
 2. **Nyomtasd ki a `receiver_test.stl` + `jaw_test.stl` párost** (kb. 30 perc), szereld össze
-   1 M4 + 1 M5 csavarral, és próbáld rá a lézer sínjére. Ha jól fogja, jöhet a
+   2 M5 × 20 csavarral, és próbáld rá a lézer sínjére. Ha jól fogja, jöhet a
    nagy lap. Ha nem, állítsd a `rail_w`, `rail_lip`, `rail_clr` értékeket.
 3. **Függőleges hely (`rec_z0`)**: a sín alja (az ütköző) alapból 60 mm-rel van a bilincs alja
    alatt. A lézerház alja kb. 12 mm-rel van a sín vége alatt, a fókuszgomb további ~10 mm-rel,
@@ -61,12 +61,20 @@ csavarozódik a lézer közepénél. Így a lézer nem lóg ki oldalra, a kar r�
 
 ## Szükséges csavarok
 
-| Mire | Csavar | Db |
-|---|---|---|
-| bilincs összehúzása | M5 × 30 + M5 anya | 4 |
-| tartólap a bilincs talpára | **M5 × 16** hengeresfejű (imbusz) + M5 anya + alátét | 2 |
-| mozgó pofa vezetése | M4 × 16 (hengeresfejű) + **M4 nyloc anya** | 2 |
-| szorítócsavar | M5 × 25 **hatlapfejű** + M5 anya (a gombba nyomva) | 1 + 1 |
+**Minden csavar M5 × 20 hengeresfejű (imbusz, DIN 912)**, a süllyesztések erre vannak méretezve.
+
+| Mire | Csavar | Anya | Db |
+|---|---|---|---|
+| bilincs összehúzása | M5 × 20 | M5 anya (a bal fél csapdáiban) | 4 |
+| tartólap a bilincs talpára | M5 × 20 | M5 anya (a talp felső hornyaiban) | 2 |
+| mozgó pofa vezetése | M5 × 20 | **M5 önzáró (nyloc) anya** (a lap hátoldalán) | 2 |
+| szorítócsavar a gombban | M5 × 20 (hatlapfejű is jó) | M5 anya (az ellentartó hornyában) | 1 |
+| **összesen** | **9 db M5 × 20** | **7 db M5 anya + 2 db M5 nyloc** | |
+
+- A gomb hatszög zsebe a hatlapfejű csavart pontosan, a hengeres (imbusz) fejet szorosan fogja,
+  nyomd be, és egy csepp pillanatragasztó biztosítja.
+- Ha nincs nyloc anyád, sima M5 anya + menetrögzítő (pl. Loctite 243) is jó a vezetőcsavarokhoz.
+- A talpcsavaroknál **ne tegyél alátétet** a fej alá, a süllyesztés pont a fejnek van méretezve.
 
 A gomb helyett vehetsz **M5-ös állítható szorítókart** (az SF-A9-en is ilyen piros kar van),
 az ugyanide csavarható.
@@ -84,13 +92,13 @@ az ugyanide csavarható.
 1. Bilincs: anyák a csapdákba, a két fél a spindle-re a gyári tartó **alá**, a talp arra
    nézzen, ahová a lézert szeretnéd. Ha a hátsó szorítófül a Z-kocsiba ütközne, forgasd el a
    bilincset a spindle körül (pl. lézer elöl, fülek oldalt). Húzd meg egyenletesen a 4 M5-öt.
-2. Mozgó pofa: tedd a lap hátoldalán lévő hatszög zsebekbe az M4 nyloc anyákat, majd a két M4
+2. Mozgó pofa: tedd a lap hátoldalán lévő hatszög zsebekbe az M5 nyloc anyákat, majd a két M5
    csavart a pofa hosszlyukain át. **Csak annyira húzd meg, hogy a pofa még csússzon, de ne
    lötyögjön** (a nyloc anya megtartja a beállítást).
-3. M5 anya az ellentartó felső hornyába, a hatlapfejű M5 csavart nyomd a gombba, és csavard be.
-4. M5 anyákat a talp felső hornyaiba, majd a tartólapot a 2 M5 × 16-tal a hosszlyukakon át a
+3. M5 anya az ellentartó felső hornyába, az M5 × 20 csavart nyomd a gombba, és csavard be.
+4. M5 anyákat a talp felső hornyaiba, majd a tartólapot a 2 M5 × 20-szal a hosszlyukakon át a
    talpra csavarozod. A csavarfejek a lapba süllyednek, a lézer sínje átcsúszik felettük.
-   **Ne használj 16 mm-nél hosszabb csavart**, mert a spindle-hez érhet.
+   **Ne használj 20 mm-nél hosszabb csavart**, mert a spindle-hez érhet.
 5. Lézer be felülről az ütközőig, szorítsd meg a gombot.
 6. **Fókusz:** (a lézert kivéve érhetők el a csavarok) kivett szerszámmal a Z-vel menj le, a
    tartólapot a hosszlyukakban tolva állítsd
